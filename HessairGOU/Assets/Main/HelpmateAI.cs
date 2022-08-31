@@ -22,6 +22,7 @@ public class HelpmateAI : MonoBehaviour
     public Transform helpmateGFX;
 
     Path path;
+    Vector2 direction;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
 
@@ -70,7 +71,7 @@ public class HelpmateAI : MonoBehaviour
             reachedEndOfPath = true;
             horizontalMove = 0;
             controller.Move(horizontalMove * Time.fixedDeltaTime, isCrouching, isJumping);
-            animator.SetFloat("Speed", 0);
+            animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
             return;
         }
         else
@@ -78,11 +79,13 @@ public class HelpmateAI : MonoBehaviour
             reachedEndOfPath = false;
         }
 
+        direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
+        float playerDistance = Vector2.Distance(rb.position, player.position);
 
-        Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
-        float targetDistance = Vector2.Distance(rb.position, player.position);
-        float newSpeed = runSpeed * Mathf.Clamp(targetDistance / 10, 0, 2);
-        Vector2 force = (direction * newSpeed * Time.deltaTime);
+        if(playerDistance > 10)
+        {
+            rb.position = player.position;
+        }
 
         if(direction.x > 0.01f)
         {
@@ -94,14 +97,14 @@ public class HelpmateAI : MonoBehaviour
 
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
 
-        if (direction.y > 0.1f )
+        controller.Move(horizontalMove * Time.fixedDeltaTime, isCrouching, isJumping);
+        isJumping = false;
+
+        if (direction.y > 0.1f && !animator.GetBool("IsJumping"))
         {
             isJumping = true;
             animator.SetBool("IsJumping", true);
         }
-
-        controller.Move(horizontalMove * Time.fixedDeltaTime, isCrouching, isJumping);
-        isJumping = false;
 
         float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
 
