@@ -5,8 +5,7 @@ using Pathfinding;
 
 public class FollowerAI : MonoBehaviour
 {
-
-    public Transform target;
+    public Transform player;
     public float speed = 200f;
     public float nextWaypointDistance = 3f;
 
@@ -31,7 +30,7 @@ public class FollowerAI : MonoBehaviour
     {
         if (seeker.IsDone())
         {
-            seeker.StartPath(rb.position, new Vector3(target.position.x, target.position.y + 2, target.position.z) , OnPathComplete);
+            seeker.StartPath(rb.position, new Vector3(player.position.x, player.position.y + 2, player.position.z) , OnPathComplete);
         }
     }
 
@@ -51,7 +50,7 @@ public class FollowerAI : MonoBehaviour
             return;
         }
 
-        if(currentWaypoint >= path.vectorPath.Count || Vector2.Distance(rb.position, new Vector2(target.position.x, target.position.y + 2)) <= 1f)
+        if(currentWaypoint >= path.vectorPath.Count || Vector2.Distance(rb.position, new Vector2(player.position.x, player.position.y + 2)) <= 1f)
         {
             reachedEndOfPath = true;
             return;
@@ -63,9 +62,8 @@ public class FollowerAI : MonoBehaviour
 
         
         Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
-        float targetDistance = Vector2.Distance(rb.position, target.position );
+        float targetDistance = Vector2.Distance(rb.position, player.position );
         float newSpeed = speed * Mathf.Clamp(targetDistance/10, 0,2);
-        print(newSpeed);
         Vector2 force = (direction * newSpeed * Time.deltaTime);
 
         rb.AddForce(force);
